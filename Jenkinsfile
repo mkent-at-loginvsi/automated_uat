@@ -2,8 +2,19 @@ pipeline {
   agent any
   stages {
     stage('Build Target OS') {
-      steps {
-        sh 'echo "Hello World!"'
+      parallel {
+        stage('Build Target OS') {
+          steps {
+            sh 'echo "Hello World!"'
+          }
+        }
+
+        stage('Configure OS') {
+          steps {
+            sh 'echo "Hello World!"'
+          }
+        }
+
       }
     }
 
