@@ -1,0 +1,53 @@
+---
+BuildingDockerImage: ~
+PushingToDockerRegistry: ~
+SnykAppScan: ~
+SnykScanImage: ~
+add_flow_volume_to_composition: true
+build.image.id: "${{CF_BUILD_ID}}"
+candidate: "${{BuildingDockerImage}}"
+command: "python snyk-cli.py \"${{IMAGE_NAME}}:${{CF_BRANCH_TAG_NORMALIZED}}\""
+commands:
+  - "npm install -g snyk"
+  - "snyk test --severity-threshold=high"
+composition: ~
+composition_candidates: ~
+content: "|- FROM node:8.0-alpine AS builder WORKDIR /app COPY package.json /app # Creating tar of productions dependencies RUN npm install --production && cp -rp ./node_modules /tmp/node_modules # Installing all dependencies RUN npm install # Copying application code COPY . /app"
+depends_on:
+  - targetimage
+dockerfile: ~
+environment:
+  - "SNYK_TOKEN=${{SNYK_TOKEN}}"
+  - "SNYK_ORG=${{SNYK_ORG}}"
+  - "CFCR_ACCOUNT=${{CFCR_ACCOUNT}}"
+  - "CF_USER_NAME=${{CF_USER_NAME}}"
+  - "CFCR_LOGIN_TOKEN=${{CFCR_LOGIN_TOKEN}}"
+image: aarlaudsnyk/snyk-container-scan-docker
+image_name: "${{IMAGE_NAME}}"
+labels: ~
+metadata: ~
+on_fail: ~
+on_success: ~
+registry: aarlaudsnyk
+scan_service: ~
+services: ~
+set:
+  -
+    ? "${{BuildingDockerImage.imageId}}"
+    : ~
+  -
+    SECURITY_SCAN: false
+stage: promote
+stages:
+  - scan
+  - promote
+steps: ~
+tag: "${{CF_BRANCH_TAG_NORMALIZED}}"
+targetimage: ~
+title: "Pushing to Docker Registry"
+type: push
+version: "2"
+volumes:
+  - "/var/run/docker.sock:/var/run/docker.sock"
+  - "/var/lib/docker:/var/lib/docker"
+working_directory: IMAGE_WORK_DIR
